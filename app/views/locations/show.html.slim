@@ -1,4 +1,4 @@
-.container(style="margin-top: 1rem")  
+.container(style="margin-top: 1rem")
   - if @location.empty?
     h2
       | Location not found
@@ -32,7 +32,7 @@
         | Timezone
       dd
         = @location['timezone_name']
-    
+
       - @location['consolidated_weather'].each do |report|
         hr
 
@@ -40,6 +40,10 @@
           | Applicable Date
         dd
           = report['applicable_date']
+        dt
+          | Weather Icon
+        dd
+          img(src="https://www.metaweather.com/static/img/weather/png/64/#{report['weather_state_abbr']}.png")
         dt
           | Min Temp
         dd
