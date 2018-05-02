@@ -5,7 +5,9 @@ ruby '2.5.0'
 
 gem 'rails', '~> 5.2.0'
 
-### Database 
+gem 'jquery-rails'
+
+### Database
 gem 'pg', '>= 0.18', '< 2.0'
 # gem 'redis', '~> 4.0'
 
