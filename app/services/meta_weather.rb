@@ -6,8 +6,10 @@ class MetaWeather
   end
 
   def search
-    response = RestClient.get('https://www.metaweather.com/api/location/search/', params: { query: params[:query] })
-    JSON.parse(response.body)
+    Rails.cache.fetch(["query", params[:query]]) do
+      response = RestClient.get('https://www.metaweather.com/api/location/search/', params: { query: params[:query] })
+      JSON.parse(response.body)
+    end
   rescue
     []
   end
@@ -15,7 +17,7 @@ class MetaWeather
   def location_data
     response = RestClient.get("https://www.metaweather.com/api/location/#{params[:id]}")
     JSON.parse(response.body)
-  rescue 
+  rescue
     {}
   end
 end
