@@ -3,11 +3,9 @@ import { connect } from 'react-redux';
 import { searchLocation } from './../../actions/location_actions';
 import LocationShow from './location_show';
 
-const mapStateToProps = state => {
-  return {
+const mapStateToProps = state => ({
     location: state.location || {}
-  };
-};
+});
 
 const mapDispatchToProps = dispatch => ({
   searchLocation: id => dispatch(searchLocation(id))

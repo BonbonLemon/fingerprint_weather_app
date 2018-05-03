@@ -12,3 +12,10 @@ export const searchLocation = id => (
     url: '/locations/' + id
   })
 );
+
+export const getCacheKeys = () => (
+  $.ajax({
+    method: 'GET',
+    url: '/cache_keys'
+  })
+);

@@ -73,6 +73,9 @@ class LocationIndex extends React.Component {
     return (
       <div>
         <div className="container" style={{marginTop: "1rem"}} >
+          <Link to="/admin">
+            <button type="button" className="btn btn-info" style={{marginBottom: "2rem"}}>I'm an "Admin"</button>
+          </Link>
           <form className="form-inline" onSubmit={this.handleSubmit}>
             <div className="form-row align-items-center">
               <div className="col-auto">

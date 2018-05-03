@@ -13025,7 +13025,7 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.searchLocation = exports.searchQuery = exports.receiveLocationData = exports.receiveLocations = exports.RECEIVE_LOCATION_DATA = exports.RECEIVE_LOCATIONS = undefined;
+exports.getCacheKeys = exports.searchLocation = exports.searchQuery = exports.receiveCacheKeys = exports.receiveLocationData = exports.receiveLocations = exports.RECEIVE_CACHE_KEYS = exports.RECEIVE_LOCATION_DATA = exports.RECEIVE_LOCATIONS = undefined;
 
 var _location_api_util = __webpack_require__(301);
 
@@ -13035,6 +13035,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var RECEIVE_LOCATIONS = exports.RECEIVE_LOCATIONS = 'RECEIVE_LOCATIONS';
 var RECEIVE_LOCATION_DATA = exports.RECEIVE_LOCATION_DATA = 'RECEIVE_LOCATION_DATA';
+var RECEIVE_CACHE_KEYS = exports.RECEIVE_CACHE_KEYS = 'RECEIVE_CACHE_KEYS';
 
 var receiveLocations = exports.receiveLocations = function receiveLocations(locations) {
   return {
@@ -13050,6 +13051,13 @@ var receiveLocationData = exports.receiveLocationData = function receiveLocation
   };
 };
 
+var receiveCacheKeys = exports.receiveCacheKeys = function receiveCacheKeys(keys) {
+  return {
+    type: RECEIVE_CACHE_KEYS,
+    keys: keys
+  };
+};
+
 var searchQuery = exports.searchQuery = function searchQuery(query) {
   return function (dispatch) {
     return APIUtil.searchQuery(query).then(function (locations) {
@@ -13062,6 +13070,14 @@ var searchLocation = exports.searchLocation = function searchLocation(id) {
   return function (dispatch) {
     return APIUtil.searchLocation(id).then(function (location) {
       return dispatch(receiveLocationData(location));
+    });
+  };
+};
+
+var getCacheKeys = exports.getCacheKeys = function getCacheKeys() {
+  return function (dispatch) {
+    return APIUtil.getCacheKeys().then(function (keys) {
+      return dispatch(receiveCacheKeys(keys));
     });
   };
 };
@@ -29717,6 +29733,10 @@ var _reactRedux = __webpack_require__(67);
 
 var _reactRouterDom = __webpack_require__(70);
 
+var _admin_container = __webpack_require__(379);
+
+var _admin_container2 = _interopRequireDefault(_admin_container);
+
 var _location_index_container = __webpack_require__(300);
 
 var _location_index_container2 = _interopRequireDefault(_location_index_container);
@@ -29734,6 +29754,7 @@ var App = function App() {
     _react2.default.createElement(
       _reactRouterDom.Switch,
       null,
+      _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/admin', component: _admin_container2.default }),
       _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/', component: _location_index_container2.default }),
       _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/locations/:id', component: _location_show_container2.default })
     )
@@ -29801,6 +29822,13 @@ var searchLocation = exports.searchLocation = function searchLocation(id) {
   return $.ajax({
     method: 'GET',
     url: '/locations/' + id
+  });
+};
+
+var getCacheKeys = exports.getCacheKeys = function getCacheKeys() {
+  return $.ajax({
+    method: 'GET',
+    url: '/cache_keys'
   });
 };
 
@@ -29954,6 +29982,15 @@ var LocationIndex = function (_React$Component) {
         _react2.default.createElement(
           'div',
           { className: 'container', style: { marginTop: "1rem" } },
+          _react2.default.createElement(
+            _reactRouterDom.Link,
+            { to: '/admin' },
+            _react2.default.createElement(
+              'button',
+              { type: 'button', className: 'btn btn-info', style: { marginBottom: "2rem" } },
+              'I\'m an "Admin"'
+            )
+          ),
           _react2.default.createElement(
             'form',
             { className: 'form-inline', onSubmit: this.handleSubmit },
@@ -30441,7 +30478,11 @@ var rootReducer = function rootReducer() {
     case _location_actions.RECEIVE_LOCATIONS:
       return action.locations;
     case _location_actions.RECEIVE_LOCATION_DATA:
-      return action.location;
+      var location = action.location;
+      return (0, _merge2.default)({}, state, location);
+    case _location_actions.RECEIVE_CACHE_KEYS:
+      var keys = action.keys;
+      return (0, _merge2.default)({}, state, { keys: keys });
     default:
       return state;
   }
@@ -32841,6 +32882,98 @@ var LocationIndex = function (_React$Component) {
 }(_react2.default.Component);
 
 exports.default = LocationIndex;
+
+/***/ }),
+/* 379 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _reactRedux = __webpack_require__(67);
+
+var _location_actions = __webpack_require__(131);
+
+var _admin = __webpack_require__(380);
+
+var _admin2 = _interopRequireDefault(_admin);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapStateToProps = function mapStateToProps(state) {
+  return {
+    keys: state.keys || []
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return {
+    getCacheKeys: function getCacheKeys() {
+      return dispatch((0, _location_actions.getCacheKeys)());
+    }
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_admin2.default);
+
+/***/ }),
+/* 380 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(6);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Admin = function (_React$Component) {
+  _inherits(Admin, _React$Component);
+
+  function Admin(props) {
+    _classCallCheck(this, Admin);
+
+    return _possibleConstructorReturn(this, (Admin.__proto__ || Object.getPrototypeOf(Admin)).call(this, props));
+  }
+
+  _createClass(Admin, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.props.getCacheKeys();
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        { className: 'container', style: { marginTop: '1rem' } },
+        'hihihihi'
+      );
+    }
+  }]);
+
+  return Admin;
+}(_react2.default.Component);
+
+exports.default = Admin;
 
 /***/ })
 /******/ ]);
