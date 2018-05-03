@@ -13025,7 +13025,7 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.searchQuery = exports.receiveLocations = exports.RECEIVE_LOCATIONS = undefined;
+exports.searchLocation = exports.searchQuery = exports.receiveLocationData = exports.receiveLocations = exports.RECEIVE_LOCATION_DATA = exports.RECEIVE_LOCATIONS = undefined;
 
 var _location_api_util = __webpack_require__(301);
 
@@ -13034,6 +13034,7 @@ var APIUtil = _interopRequireWildcard(_location_api_util);
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 var RECEIVE_LOCATIONS = exports.RECEIVE_LOCATIONS = 'RECEIVE_LOCATIONS';
+var RECEIVE_LOCATION_DATA = exports.RECEIVE_LOCATION_DATA = 'RECEIVE_LOCATION_DATA';
 
 var receiveLocations = exports.receiveLocations = function receiveLocations(locations) {
   return {
@@ -13042,10 +13043,25 @@ var receiveLocations = exports.receiveLocations = function receiveLocations(loca
   };
 };
 
+var receiveLocationData = exports.receiveLocationData = function receiveLocationData(location) {
+  return {
+    type: RECEIVE_LOCATION_DATA,
+    location: location
+  };
+};
+
 var searchQuery = exports.searchQuery = function searchQuery(query) {
   return function (dispatch) {
     return APIUtil.searchQuery(query).then(function (locations) {
       return dispatch(receiveLocations(locations));
+    });
+  };
+};
+
+var searchLocation = exports.searchLocation = function searchLocation(id) {
+  return function (dispatch) {
+    return APIUtil.searchLocation(id).then(function (location) {
+      return dispatch(receiveLocationData(location));
     });
   };
 };
@@ -29705,6 +29721,10 @@ var _location_index_container = __webpack_require__(300);
 
 var _location_index_container2 = _interopRequireDefault(_location_index_container);
 
+var _location_show_container = __webpack_require__(377);
+
+var _location_show_container2 = _interopRequireDefault(_location_show_container);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var App = function App() {
@@ -29714,7 +29734,8 @@ var App = function App() {
     _react2.default.createElement(
       _reactRouterDom.Switch,
       null,
-      _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/', component: _location_index_container2.default })
+      _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/', component: _location_index_container2.default }),
+      _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: '/locations/:id', component: _location_show_container2.default })
     )
   );
 };
@@ -29773,6 +29794,13 @@ var searchQuery = exports.searchQuery = function searchQuery(query) {
     method: 'GET',
     url: '/locations',
     data: { query: query }
+  });
+};
+
+var searchLocation = exports.searchLocation = function searchLocation(id) {
+  return $.ajax({
+    method: 'GET',
+    url: '/locations/' + id
   });
 };
 
@@ -30412,6 +30440,8 @@ var rootReducer = function rootReducer() {
   switch (action.type) {
     case _location_actions.RECEIVE_LOCATIONS:
       return action.locations;
+    case _location_actions.RECEIVE_LOCATION_DATA:
+      return action.location;
     default:
       return state;
   }
@@ -32582,6 +32612,235 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
+
+/***/ }),
+/* 377 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _reactRedux = __webpack_require__(67);
+
+var _location_actions = __webpack_require__(131);
+
+var _location_show = __webpack_require__(378);
+
+var _location_show2 = _interopRequireDefault(_location_show);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var mapStateToProps = function mapStateToProps(state) {
+  return {
+    location: state.location || {}
+  };
+};
+
+var mapDispatchToProps = function mapDispatchToProps(dispatch) {
+  return {
+    searchLocation: function searchLocation(id) {
+      return dispatch((0, _location_actions.searchLocation)(id));
+    }
+  };
+};
+
+exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_location_show2.default);
+
+/***/ }),
+/* 378 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(6);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var LocationIndex = function (_React$Component) {
+  _inherits(LocationIndex, _React$Component);
+
+  function LocationIndex(props) {
+    _classCallCheck(this, LocationIndex);
+
+    return _possibleConstructorReturn(this, (LocationIndex.__proto__ || Object.getPrototypeOf(LocationIndex)).call(this, props));
+  }
+
+  _createClass(LocationIndex, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var woeid = parseInt(this.props.match.params.id);
+      this.props.searchLocation(woeid);
+    }
+  }, {
+    key: 'locationNotFound',
+    value: function locationNotFound() {
+      return _react2.default.createElement(
+        'h2',
+        null,
+        'Location not found'
+      );
+    }
+  }, {
+    key: 'locationData',
+    value: function locationData() {
+      var location = this.props.location;
+
+
+      return _react2.default.createElement(
+        'dl',
+        null,
+        _react2.default.createElement(
+          'dt',
+          null,
+          'Title'
+        ),
+        _react2.default.createElement(
+          'dd',
+          null,
+          location.title
+        ),
+        _react2.default.createElement(
+          'dt',
+          null,
+          'Location Type'
+        ),
+        _react2.default.createElement(
+          'dd',
+          null,
+          location.latt_long
+        ),
+        _react2.default.createElement(
+          'dt',
+          null,
+          'Time'
+        ),
+        _react2.default.createElement(
+          'dd',
+          null,
+          location.time
+        ),
+        _react2.default.createElement(
+          'dt',
+          null,
+          'Sunrise'
+        ),
+        _react2.default.createElement(
+          'dd',
+          null,
+          location.sun_rise
+        ),
+        _react2.default.createElement(
+          'dt',
+          null,
+          'Sunset'
+        ),
+        _react2.default.createElement(
+          'dd',
+          null,
+          location.sun_set
+        ),
+        _react2.default.createElement(
+          'dt',
+          null,
+          'Timezone'
+        ),
+        _react2.default.createElement(
+          'dd',
+          null,
+          location.timezone_name
+        ),
+        location.consolidated_weather.map(function (report) {
+          return _react2.default.createElement(
+            'div',
+            { key: report.id },
+            _react2.default.createElement('hr', null),
+            _react2.default.createElement(
+              'dt',
+              null,
+              'Applicable Date'
+            ),
+            _react2.default.createElement(
+              'dd',
+              null,
+              report.applicable_date
+            ),
+            _react2.default.createElement(
+              'dt',
+              null,
+              'Weather Icon'
+            ),
+            _react2.default.createElement('img', { src: "https://www.metaweather.com/static/img/weather/png/64/" + report['weather_state_abbr'] + ".png" }),
+            _react2.default.createElement(
+              'dt',
+              null,
+              'Min Temp'
+            ),
+            _react2.default.createElement(
+              'dd',
+              null,
+              report.min_temp
+            ),
+            _react2.default.createElement(
+              'dt',
+              null,
+              'Temp'
+            ),
+            _react2.default.createElement(
+              'dd',
+              null,
+              report.the_temp
+            ),
+            _react2.default.createElement(
+              'dt',
+              null,
+              'Max Temp'
+            ),
+            _react2.default.createElement(
+              'dd',
+              null,
+              report.max_temp
+            )
+          );
+        })
+      );
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var location = this.props.location;
+
+
+      return _react2.default.createElement(
+        'div',
+        { className: 'container', style: { marginTop: '1rem' } },
+        location.title ? this.locationData() : this.locationNotFound()
+      );
+    }
+  }]);
+
+  return LocationIndex;
+}(_react2.default.Component);
+
+exports.default = LocationIndex;
 
 /***/ })
 /******/ ]);

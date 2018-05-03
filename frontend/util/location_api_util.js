@@ -5,3 +5,10 @@ export const searchQuery = query => (
     data: {query}
   })
 );
+
+export const searchLocation = id => (
+  $.ajax({
+    method: 'GET',
+    url: '/locations/' + id
+  })
+);

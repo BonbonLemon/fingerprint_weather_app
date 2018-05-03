@@ -6,5 +6,6 @@ class LocationsController < ApplicationController
 
   def show
     @location = MetaWeather.new(params).location_data
+    render template: "locations/show.json.jbuilder"
   end
 end
