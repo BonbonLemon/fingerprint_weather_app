@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, withRouter } from 'react-router-dom';
 
 class LocationIndex extends React.Component {
   constructor(props) {
@@ -6,6 +7,7 @@ class LocationIndex extends React.Component {
     this.state = {
       query: ''
     };
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   update(property) {
@@ -14,32 +16,55 @@ class LocationIndex extends React.Component {
     });
   }
 
+  handleSubmit(e) {
+    e.preventDefault();
+    this.props.history.push("?query=" + this.state.query);
+    this.props.searchQuery(this.state.query);
+  }
+
+  noLocationsMessage() {
+    return (
+      <h3>Nothing to see here... :( Try search again.</h3>
+    );
+  }
+
+  locationsTable(){
+    const { locations } = this.props;
+
+    return (
+      <table className="table table-striped">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Location Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          { locations.map(location => (
+            <tr key={location['title']}>
+              <td>
+                <Link to={"locations/" + location['woeid']}>
+                  { location['title'] }
+                </Link>
+              </td>
+              <td>
+                { location['location_type'] }
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+
   render() {
-    // .container(style="margin-top: 1rem")
-    //   - if @locations.blank?
-    //     h3
-    //       | Nothing to see here... :( Try search again.
-    //   - else
-    //     table.table.table-striped
-    //       thead
-    //         tr
-    //           th
-    //             | Title
-    //           th
-    //             | Location Type
-    //
-    //       tbody
-    //         - @locations.each do |location|
-    //           tr
-    //             td
-    //               = link_to location['title'], location_path(id: location['woeid'])
-    //             td
-    //               = location['location_type']
-    const { query } = this.props;
+    const { query } = this.state;
+    const { locations } = this.props;
+
     return (
       <div>
         <div className="container" style={{marginTop: "1rem"}} >
-          <form className="form-inline">
+          <form className="form-inline" onSubmit={this.handleSubmit}>
             <div className="form-row align-items-center">
               <div className="col-auto">
                 <input
@@ -60,9 +85,12 @@ class LocationIndex extends React.Component {
             </div>
           </form>
         </div>
+        <div className="container" style={{marginTop: "1rem"}}>
+          { locations.length == 0 ? this.noLocationsMessage() : this.locationsTable() }
+        </div>
       </div>
     )
   }
 }
 
-export default LocationIndex;
+export default withRouter(LocationIndex);

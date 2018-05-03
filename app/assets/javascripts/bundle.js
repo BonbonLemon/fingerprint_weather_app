@@ -29699,6 +29699,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _reactRedux = __webpack_require__(67);
 
+var _location_actions = __webpack_require__(373);
+
 var _location_index = __webpack_require__(300);
 
 var _location_index2 = _interopRequireDefault(_location_index);
@@ -29706,11 +29708,17 @@ var _location_index2 = _interopRequireDefault(_location_index);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var mapStateToProps = function mapStateToProps(state) {
-  return {};
+  return {
+    locations: state.locations || []
+  };
 };
 
 var mapDispatchToProps = function mapDispatchToProps(dispatch) {
-  return {};
+  return {
+    searchQuery: function searchQuery(query) {
+      return dispatch((0, _location_actions.searchQuery)(query));
+    }
+  };
 };
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(_location_index2.default);
@@ -29731,6 +29739,8 @@ var _createClass = function () { function defineProperties(target, props) { for 
 var _react = __webpack_require__(6);
 
 var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterDom = __webpack_require__(123);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -29753,6 +29763,7 @@ var LocationIndex = function (_React$Component) {
     _this.state = {
       query: ''
     };
+    _this.handleSubmit = _this.handleSubmit.bind(_this);
     return _this;
   }
 
@@ -29766,29 +29777,80 @@ var LocationIndex = function (_React$Component) {
       };
     }
   }, {
+    key: 'handleSubmit',
+    value: function handleSubmit(e) {
+      e.preventDefault();
+      this.props.history.push("?query=" + this.state.query);
+      this.props.searchQuery(this.state.query);
+    }
+  }, {
+    key: 'noLocationsMessage',
+    value: function noLocationsMessage() {
+      return _react2.default.createElement(
+        'h3',
+        null,
+        'Nothing to see here... :( Try search again.'
+      );
+    }
+  }, {
+    key: 'locationsTable',
+    value: function locationsTable() {
+      var locations = this.props.locations;
+
+
+      return _react2.default.createElement(
+        'table',
+        { className: 'table table-striped' },
+        _react2.default.createElement(
+          'thead',
+          null,
+          _react2.default.createElement(
+            'tr',
+            null,
+            _react2.default.createElement(
+              'th',
+              null,
+              'Title'
+            ),
+            _react2.default.createElement(
+              'th',
+              null,
+              'Location Type'
+            )
+          )
+        ),
+        _react2.default.createElement(
+          'tbody',
+          null,
+          locations.map(function (location) {
+            return _react2.default.createElement(
+              'tr',
+              { key: location['title'] },
+              _react2.default.createElement(
+                'td',
+                null,
+                _react2.default.createElement(
+                  _reactRouterDom.Link,
+                  { to: "locations/" + location['woeid'] },
+                  location['title']
+                )
+              ),
+              _react2.default.createElement(
+                'td',
+                null,
+                location['location_type']
+              )
+            );
+          })
+        )
+      );
+    }
+  }, {
     key: 'render',
     value: function render() {
-      // .container(style="margin-top: 1rem")
-      //   - if @locations.blank?
-      //     h3
-      //       | Nothing to see here... :( Try search again.
-      //   - else
-      //     table.table.table-striped
-      //       thead
-      //         tr
-      //           th
-      //             | Title
-      //           th
-      //             | Location Type
-      //
-      //       tbody
-      //         - @locations.each do |location|
-      //           tr
-      //             td
-      //               = link_to location['title'], location_path(id: location['woeid'])
-      //             td
-      //               = location['location_type']
-      var query = this.props.query;
+      var query = this.state.query;
+      var locations = this.props.locations;
+
 
       return _react2.default.createElement(
         'div',
@@ -29798,7 +29860,7 @@ var LocationIndex = function (_React$Component) {
           { className: 'container', style: { marginTop: "1rem" } },
           _react2.default.createElement(
             'form',
-            { className: 'form-inline' },
+            { className: 'form-inline', onSubmit: this.handleSubmit },
             _react2.default.createElement(
               'div',
               { className: 'form-row align-items-center' },
@@ -29824,6 +29886,11 @@ var LocationIndex = function (_React$Component) {
               )
             )
           )
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'container', style: { marginTop: "1rem" } },
+          locations.length == 0 ? this.noLocationsMessage() : this.locationsTable()
         )
       );
     }
@@ -29832,7 +29899,7 @@ var LocationIndex = function (_React$Component) {
   return LocationIndex;
 }(_react2.default.Component);
 
-exports.default = LocationIndex;
+exports.default = (0, _reactRouterDom.withRouter)(LocationIndex);
 
 /***/ }),
 /* 301 */
@@ -29920,6 +29987,8 @@ var _merge = __webpack_require__(305);
 
 var _merge2 = _interopRequireDefault(_merge);
 
+var _location_actions = __webpack_require__(373);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var rootReducer = function rootReducer() {
@@ -29927,6 +29996,12 @@ var rootReducer = function rootReducer() {
   var action = arguments[1];
 
   Object.freeze(state);
+  switch (action.type) {
+    case _location_actions.RECEIVE_LOCATIONS:
+      return action.locations;
+    default:
+      return state;
+  }
 };
 
 exports.default = rootReducer;
@@ -32094,6 +32169,60 @@ function isIterateeCall(value, index, object) {
 
 module.exports = isIterateeCall;
 
+
+/***/ }),
+/* 372 */,
+/* 373 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.searchQuery = exports.receiveLocations = exports.RECEIVE_LOCATIONS = undefined;
+
+var _location_api_util = __webpack_require__(374);
+
+var APIUtil = _interopRequireWildcard(_location_api_util);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+var RECEIVE_LOCATIONS = exports.RECEIVE_LOCATIONS = 'RECEIVE_LOCATIONS';
+
+var receiveLocations = exports.receiveLocations = function receiveLocations(locations) {
+  return {
+    type: RECEIVE_LOCATIONS,
+    locations: locations
+  };
+};
+
+var searchQuery = exports.searchQuery = function searchQuery(query) {
+  return function (dispatch) {
+    return APIUtil.searchQuery(query).then(function (locations) {
+      return dispatch(receiveLocations(locations));
+    });
+  };
+};
+
+/***/ }),
+/* 374 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var searchQuery = exports.searchQuery = function searchQuery(query) {
+  return $.ajax({
+    method: 'GET',
+    url: '/locations',
+    data: { query: query }
+  });
+};
 
 /***/ })
 /******/ ]);
