@@ -50,7 +50,7 @@ class LocationIndex extends React.Component {
         </thead>
         <tbody>
           { locations.map(location => (
-            <tr key={location['title']}>
+            <tr key={location['woeid']}>
               <td>
                 <Link to={"locations/" + location['woeid']}>
                   { location['title'] }

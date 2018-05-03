@@ -29973,7 +29973,7 @@ var LocationIndex = function (_React$Component) {
           locations.map(function (location) {
             return _react2.default.createElement(
               'tr',
-              { key: location['title'] },
+              { key: location['woeid'] },
               _react2.default.createElement(
                 'td',
                 null,
