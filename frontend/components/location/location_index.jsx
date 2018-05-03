@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
+import * as qs from 'query-string';
 
 class LocationIndex extends React.Component {
   constructor(props) {
@@ -8,6 +9,14 @@ class LocationIndex extends React.Component {
       query: ''
     };
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    const params = qs.parse(this.props.location.search);
+    if (params.query) {
+      this.setState({query: params.query})
+      this.props.searchQuery(params.query);
+    }
   }
 
   update(property) {
