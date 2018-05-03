@@ -13025,7 +13025,7 @@ var isExtraneousPopstateEvent = function isExtraneousPopstateEvent(event) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getCacheKeys = exports.searchLocation = exports.searchQuery = exports.receiveCacheKeys = exports.receiveLocationData = exports.receiveLocations = exports.RECEIVE_CACHE_KEYS = exports.RECEIVE_LOCATION_DATA = exports.RECEIVE_LOCATIONS = undefined;
+exports.deleteCacheKey = exports.getCacheKeys = exports.searchLocation = exports.searchQuery = exports.removeCacheKey = exports.receiveCacheKeys = exports.receiveLocationData = exports.receiveLocations = exports.REMOVE_CACHE_KEY = exports.RECEIVE_CACHE_KEYS = exports.RECEIVE_LOCATION_DATA = exports.RECEIVE_LOCATIONS = undefined;
 
 var _location_api_util = __webpack_require__(301);
 
@@ -13036,6 +13036,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 var RECEIVE_LOCATIONS = exports.RECEIVE_LOCATIONS = 'RECEIVE_LOCATIONS';
 var RECEIVE_LOCATION_DATA = exports.RECEIVE_LOCATION_DATA = 'RECEIVE_LOCATION_DATA';
 var RECEIVE_CACHE_KEYS = exports.RECEIVE_CACHE_KEYS = 'RECEIVE_CACHE_KEYS';
+var REMOVE_CACHE_KEY = exports.REMOVE_CACHE_KEY = 'REMOVE_CACHE_KEY';
 
 var receiveLocations = exports.receiveLocations = function receiveLocations(locations) {
   return {
@@ -13055,6 +13056,13 @@ var receiveCacheKeys = exports.receiveCacheKeys = function receiveCacheKeys(keys
   return {
     type: RECEIVE_CACHE_KEYS,
     keys: keys
+  };
+};
+
+var removeCacheKey = exports.removeCacheKey = function removeCacheKey(key) {
+  return {
+    type: REMOVE_CACHE_KEY,
+    key: key
   };
 };
 
@@ -13078,6 +13086,14 @@ var getCacheKeys = exports.getCacheKeys = function getCacheKeys() {
   return function (dispatch) {
     return APIUtil.getCacheKeys().then(function (keys) {
       return dispatch(receiveCacheKeys(keys));
+    });
+  };
+};
+
+var deleteCacheKey = exports.deleteCacheKey = function deleteCacheKey(key) {
+  return function (dispatch) {
+    return APIUtil.deleteCacheKey(key).then(function (key) {
+      return dispatch(removeCacheKey(key));
     });
   };
 };
@@ -29832,6 +29848,14 @@ var getCacheKeys = exports.getCacheKeys = function getCacheKeys() {
   });
 };
 
+var deleteCacheKey = exports.deleteCacheKey = function deleteCacheKey(key) {
+  return $.ajax({
+    method: 'GET',
+    url: '/delete_cache_key/',
+    data: { key: key }
+  });
+};
+
 /***/ }),
 /* 302 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -30474,6 +30498,7 @@ var rootReducer = function rootReducer() {
   var action = arguments[1];
 
   Object.freeze(state);
+  var newState = (0, _merge2.default)({}, state);
   switch (action.type) {
     case _location_actions.RECEIVE_LOCATIONS:
       return action.locations;
@@ -30483,6 +30508,10 @@ var rootReducer = function rootReducer() {
     case _location_actions.RECEIVE_CACHE_KEYS:
       var keys = action.keys;
       return (0, _merge2.default)({}, state, { keys: keys });
+    case _location_actions.REMOVE_CACHE_KEY:
+      var indexOfKeyToRemove = state.keys.indexOf(action.key);
+      newState.keys.splice(indexOfKeyToRemove, 1);
+      return newState;
     default:
       return state;
   }
@@ -32914,6 +32943,9 @@ var mapDispatchToProps = function mapDispatchToProps(dispatch) {
   return {
     getCacheKeys: function getCacheKeys() {
       return dispatch((0, _location_actions.getCacheKeys)());
+    },
+    deleteCacheKey: function deleteCacheKey(key) {
+      return dispatch((0, _location_actions.deleteCacheKey)(key));
     }
   };
 };
@@ -32960,12 +32992,41 @@ var Admin = function (_React$Component) {
       this.props.getCacheKeys();
     }
   }, {
+    key: 'deleteKey',
+    value: function deleteKey(e, key) {
+      e.preventDefault();
+      this.props.deleteCacheKey(key);
+    }
+  }, {
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
+      var keys = this.props.keys;
+
+
       return _react2.default.createElement(
         'div',
         { className: 'container', style: { marginTop: '1rem' } },
-        'hihihihi'
+        _react2.default.createElement(
+          'h3',
+          null,
+          'Cache Keys'
+        ),
+        keys.map(function (key) {
+          return _react2.default.createElement(
+            'div',
+            { key: key },
+            key,
+            _react2.default.createElement(
+              'button',
+              { type: 'button', className: 'btn btn-danger btn-sm', onClick: function onClick(e) {
+                  return _this2.deleteKey(e, key);
+                } },
+              'Delete'
+            )
+          );
+        })
       );
     }
   }]);

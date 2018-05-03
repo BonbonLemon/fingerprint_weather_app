@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { getCacheKeys } from './../../actions/location_actions';
+import { getCacheKeys, deleteCacheKey } from './../../actions/location_actions';
 import Admin from './admin';
 
 const mapStateToProps = state => ({
@@ -8,7 +8,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCacheKeys: () => dispatch(getCacheKeys())
+  getCacheKeys: () => dispatch(getCacheKeys()),
+  deleteCacheKey: key => dispatch(deleteCacheKey(key))
 });
 
 export default connect(

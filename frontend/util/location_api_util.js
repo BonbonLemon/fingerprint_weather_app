@@ -19,3 +19,11 @@ export const getCacheKeys = () => (
     url: '/cache_keys'
   })
 );
+
+export const deleteCacheKey = key => (
+  $.ajax({
+    method: 'GET',
+    url: '/delete_cache_key/',
+    data: {key}
+  })
+);

@@ -4,7 +4,9 @@ class CacheKeysController < ApplicationController
     render json: keys
   end
 
-  def delete
-
+  def delete_key
+    key = params[:key]
+    Rails.cache.delete(key)
+    render json: key.to_json
   end
 end
